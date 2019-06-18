@@ -93,8 +93,8 @@ for var in cat_l:
 
 ## plot a histgram
 y_train['logprice'] = np.log1p(y_train['SalePrice'])
-sns.distplot(y_train['logprice'], bins = 300, fit = stats.norm)
-plt.show(
+sns.distplot(y_train['logprice'], bins=300, fit=stats.norm)
+plt.show()
 
 x = X.iloc[0:1460, ]
 sns.scatterplot(x['GrLivArea'], y_train['logprice'])
@@ -120,33 +120,30 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
-steps = [('scaler', StandardScaler()),
-		('ridge', Ridge())]
+steps = [('scaler', StandardScaler()), ('ridge', Ridge())]
 
 pipeline = Pipeline(steps)
 
 params = {'ridge__alpha': np.logspace(2, 3, 100)}
 
-cv = GridSearchCV(pipeline, params, cv = 4)
+cv = GridSearchCV(pipeline, params, cv=4)
 cv.fit(X_train, y_train['logprice'])
 y_train['pred'] = cv.predict(X_train)
 
-# rmse on the train dataset
+"""rmse on the train dataset"""
 rmse = np.sqrt(mean_squared_error(y_train['logprice'], y_train['pred']))
 print("Root Mean Squared Error: {}".format(rmse))
-# Root Mean Squared Error: 0.11721060569306577
 
-## plot residual
+"""plot residual"""
 y_train['e'] = y_train['logprice'] - y_train['pred']
-sns.distplot(y_train['e'], bins = 300, fit = stats.norm)
+sns.distplot(y_train['e'], bins=300, fit=stats.norm)
 plt.show()
 
-sns.relplot(x = 'logprice', y = 'e', data=y_train)
+sns.relplot(x='logprice', y='e', data=y_train)
 plt.show()
 
-#######################
-## gradient tree model
-#######################
+"""gradient tree model"""
+
 X2 = X.copy()
 for var in cat_l:
 	X2[var] = X2[var].cat.codes
@@ -187,12 +184,12 @@ y_train['pred'] = GBR.predict(X_train)
 rmse = np.sqrt(mean_squared_error(y_train['logprice'], y_train['pred']))
 print("Root Mean Squared Error: {}".format(rmse))
 
-## plot residual
+"""plot residual"""
 y_train['e'] = y_train['logprice'] - y_train['pred']
 sns.distplot(y_train['e'], bins = 300, fit = stats.norm)
 plt.show()
 
-sns.relplot(x = 'logprice', y = 'e', data=y_train)
+sns.relplot(x='logprice', y='e', data=y_train)
 plt.show()
 
 y_pred = GBcv.predict(X_test)
@@ -201,4 +198,5 @@ prediction = pd.DataFrame({'Id': Id_test,
 							'SalePrice': y_pred})
 
 prediction.to_csv("csv_to_submit.csv", index = False)
+
 

@@ -34,6 +34,9 @@ n_feature = len(features)
 X_scaler = StandardScaler()
 X_train = X_scaler.fit_transform(X_train)
 
+
+import pystan 
+
 hierarchical_intercept = """
 data{
 	int<lower = 0> N;                //num individuals
@@ -68,3 +71,24 @@ model{
 	for (n in 1:N)
 		y[n] ~normal(x[n] * beta[jj[n]], sigma);
 }
+"""
+pooled_data_dict = {
+	'N' = len(y_train['logprice'],
+	'K' = n_feature,
+	'J' = n_neighbor,
+	'L' = ??,
+	'jj' = ??,
+	'u' = ??,
+	'x' = X_train,
+	'y' = y_train['logprice']) 
+}
+
+""" needs to find out what's the group predictors. 
+maybe we could do something like local economy indicator or something
+"""
+pooled_fit = pystan.stan(model_code=hierarchical_intercept, 
+                         data=pooled_data_dict, 
+                         iter=1000, 
+                         chains=2)
+
+
